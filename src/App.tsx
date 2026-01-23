@@ -69,7 +69,7 @@ function App() {
 
   useEffect(() => {
     const calculateDays = () => {
-      const festivalDate = new Date('2026-02-28')
+      const festivalDate = new Date(2026, 1, 28) // Month is 0-indexed (1 = February)
       const today = new Date()
       const diffTime = festivalDate.getTime() - today.getTime()
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
