@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import festivalMap from './assets/festival map.png'
 import toasterImage from './assets/toaster.png'
 
@@ -21,10 +21,17 @@ function App() {
   const [activeTab, setActiveTab] = useState<Tab>('lineup')
   const [daysUntilFestival, setDaysUntilFestival] = useState(0)
   const [flyingElements, setFlyingElements] = useState<FlyingElement[]>([])
-  const [points, setPoints] = useState(49)
+  const [points, setPoints] = useState(499)
   const [gameStarted, setGameStarted] = useState(false)
   const [celebration, setCelebration] = useState(false)
-  const [celebrationLevel, setCelebrationLevel] = useState(0) // 0 = none, 1 = 20pts, 2 = 50pts
+  const [celebrationLevel, setCelebrationLevel] = useState(0) // 0 = none, 1 = 20pts, 2 = 50pts, 3 = 100pts, 4 = 500pts
+  const [toasterPosition, setToasterPosition] = useState({ x: 25, y: 25 })
+  const pointsRef = useRef(points)
+
+  // Keep ref in sync with points
+  useEffect(() => {
+    pointsRef.current = points
+  }, [points])
 
   const handleElementClick = (elementId: number, pointValue: number) => {
     if (!gameStarted) {
@@ -43,6 +50,18 @@ function App() {
     // Trigger MEGA celebration when first crossing 50 points
     else if (points < 50 && newPoints >= 50) {
       setCelebrationLevel(2)
+      setCelebration(true)
+      setTimeout(() => setCelebration(false), 5000) // Show for 5 seconds
+    }
+    // Trigger ULTIMATE celebration when first crossing 100 points
+    else if (points < 100 && newPoints >= 100) {
+      setCelebrationLevel(3)
+      setCelebration(true)
+      setTimeout(() => setCelebration(false), 5000) // Show for 5 seconds
+    }
+    // Trigger MAXIMUM celebration when first crossing 500 points
+    else if (points < 500 && newPoints >= 500) {
+      setCelebrationLevel(4)
       setCelebration(true)
       setTimeout(() => setCelebration(false), 5000) // Show for 5 seconds
     }
@@ -66,7 +85,7 @@ function App() {
   useEffect(() => {
     // Random flying elements
     const triggerRandomElements = () => {
-      const elements = [
+      const regularElements = [
         { emoji: '🌴', isImage: false, pointValue: 1 },
         { emoji: '🎵', isImage: false, pointValue: 2 },
         { emoji: '🌺', isImage: false, pointValue: 3 },
@@ -74,67 +93,78 @@ function App() {
         { emoji: '☀️', isImage: false, pointValue: 3 },
         { emoji: toasterImage, isImage: true, pointValue: 10 }
       ]
+      const toasterOnly = [
+        { emoji: toasterImage, isImage: true, pointValue: 10 }
+      ]
+
+      // At 500+ points, everything becomes a toaster
+      const elements = pointsRef.current >= 500 ? toasterOnly : regularElements
       const colors = ['#00ffff', '#ff00ff', '#ff6b9d', '#ffa500']
 
-      // Create one element
-      const randomElement = elements[Math.floor(Math.random() * elements.length)]
-      const randomColor = colors[Math.floor(Math.random() * colors.length)]
-      const randomAngle = Math.random() * 360 // Random angle in degrees
-      const randomSize = Math.random() * 6 + 2 // 2-8rem (much more variation)
-      const randomDuration = Math.random() * 4 + 5 // 5-9 seconds
+      // Create 5 elements if over 100 points, otherwise 1
+      const numElements = pointsRef.current >= 100 ? 5 : 1
 
-      // Start from random edge of screen based on angle
-      let randomTop, randomLeft
-      if (randomAngle < 90) {
-        // Start from left side
-        randomLeft = -10
-        randomTop = Math.random() * 100
-      } else if (randomAngle < 180) {
-        // Start from top
-        randomTop = -10
-        randomLeft = Math.random() * 100
-      } else if (randomAngle < 270) {
-        // Start from right side
-        randomLeft = 110
-        randomTop = Math.random() * 100
-      } else {
-        // Start from bottom
-        randomTop = 110
-        randomLeft = Math.random() * 100
+      for (let i = 0; i < numElements; i++) {
+        const randomElement = elements[Math.floor(Math.random() * elements.length)]
+        const randomColor = colors[Math.floor(Math.random() * colors.length)]
+        const randomAngle = Math.random() * 360 // Random angle in degrees
+        const randomSize = Math.random() * 6 + 2 // 2-8rem (much more variation)
+        const randomDuration = Math.random() * 4 + 5 // 5-9 seconds
+
+        // Start from random edge of screen based on angle
+        let randomTop, randomLeft
+        if (randomAngle < 90) {
+          // Start from left side
+          randomLeft = -10
+          randomTop = Math.random() * 100
+        } else if (randomAngle < 180) {
+          // Start from top
+          randomTop = -10
+          randomLeft = Math.random() * 100
+        } else if (randomAngle < 270) {
+          // Start from right side
+          randomLeft = 110
+          randomTop = Math.random() * 100
+        } else {
+          // Start from bottom
+          randomTop = 110
+          randomLeft = Math.random() * 100
+        }
+
+        const newElement: FlyingElement = {
+          id: Date.now() + i * 100 + Math.floor(Math.random() * 100), // Integer IDs for CSS animations
+          emoji: randomElement.emoji,
+          isImage: randomElement.isImage,
+          pointValue: randomElement.pointValue,
+          top: randomTop,
+          left: randomLeft,
+          size: `${randomSize}rem`,
+          color: randomColor,
+          duration: randomDuration,
+          angle: randomAngle
+        }
+
+        setFlyingElements(prev => [...prev, newElement])
+
+        // Remove element after animation completes
+        setTimeout(() => {
+          setFlyingElements(prev => prev.filter(el => el.id !== newElement.id))
+        }, randomDuration * 1000)
       }
-
-      const newElement: FlyingElement = {
-        id: Date.now(),
-        emoji: randomElement.emoji,
-        isImage: randomElement.isImage,
-        pointValue: randomElement.pointValue,
-        top: randomTop,
-        left: randomLeft,
-        size: `${randomSize}rem`,
-        color: randomColor,
-        duration: randomDuration,
-        angle: randomAngle
-      }
-
-      setFlyingElements(prev => [...prev, newElement])
-
-      // Remove element after animation completes
-      setTimeout(() => {
-        setFlyingElements(prev => prev.filter(el => el.id !== newElement.id))
-      }, randomDuration * 1000)
     }
 
     // Trigger randomly between 1-3 seconds (much more frequent)
+    let timeoutId: NodeJS.Timeout
     const scheduleNext = () => {
       const delay = Math.random() * 2000 + 1000 // 1-3 seconds
-      return setTimeout(() => {
+      timeoutId = setTimeout(() => {
         triggerRandomElements()
         scheduleNext()
       }, delay)
     }
 
-    const timeout = scheduleNext()
-    return () => clearTimeout(timeout)
+    scheduleNext()
+    return () => clearTimeout(timeoutId)
   }, [])
 
   // Collision detection for spinning guitar
@@ -177,11 +207,73 @@ function App() {
     return () => cancelAnimationFrame(animationId)
   }, [points, flyingElements])
 
+  // Random movement for zooming toaster
+  useEffect(() => {
+    if (points < 100) return
+
+    const scheduleNextMove = () => {
+      const newX = Math.random() * 80 + 10 // 10-90%
+      const newY = Math.random() * 80 + 10 // 10-90%
+      setToasterPosition({ x: newX, y: newY })
+
+      // Schedule next move with new random delay
+      const delay = Math.random() * 1000 + 1000 // 1-2 seconds
+      return setTimeout(scheduleNextMove, delay)
+    }
+
+    const timeout = scheduleNextMove()
+    return () => clearTimeout(timeout)
+  }, [points])
+
+  // Collision detection for zooming toaster
+  useEffect(() => {
+    if (points < 100) return
+
+    const checkCollisions = () => {
+      const toaster = document.getElementById('zooming-toaster')
+      if (!toaster) return
+
+      const toasterRect = toaster.getBoundingClientRect()
+      const toasterCenterX = toasterRect.left + toasterRect.width / 2
+      const toasterCenterY = toasterRect.top + toasterRect.height / 2
+      const toasterRadius = toasterRect.width / 2
+
+      flyingElements.forEach((element) => {
+        const elementDiv = document.querySelector(`[data-element-id="${element.id}"]`)
+        if (!elementDiv) return
+
+        const elementRect = elementDiv.getBoundingClientRect()
+        const elementCenterX = elementRect.left + elementRect.width / 2
+        const elementCenterY = elementRect.top + elementRect.height / 2
+        const elementRadius = elementRect.width / 2
+
+        // Calculate distance between centers
+        const dx = toasterCenterX - elementCenterX
+        const dy = toasterCenterY - elementCenterY
+        const distance = Math.sqrt(dx * dx + dy * dy)
+
+        // Check if they're overlapping
+        if (distance < toasterRadius + elementRadius) {
+          handleElementClick(element.id, element.pointValue)
+        }
+      })
+
+      requestAnimationFrame(checkCollisions)
+    }
+
+    const animationId = requestAnimationFrame(checkCollisions)
+    return () => cancelAnimationFrame(animationId)
+  }, [points, flyingElements])
+
   return (
     <div
       className="min-h-screen bg-gradient-to-b from-purple-900 via-pink-800 to-orange-600 select-none"
       style={{
-        cursor: points >= 20 ? `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewport='0 0 64 64' style='font-size:56px;'><text y='56'>🎸</text></svg>") 32 32, auto` : 'auto'
+        cursor: points >= 500
+          ? `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewport='0 0 64 64' style='font-size:56px;'><text y='56'>🍞</text></svg>") 32 32, auto`
+          : points >= 20
+          ? `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewport='0 0 64 64' style='font-size:56px;'><text y='56'>🎸</text></svg>") 32 32, auto`
+          : 'auto'
       }}>
       <div className="relative overflow-hidden">
         {/* Retro grid background effect */}
@@ -268,31 +360,53 @@ function App() {
         {celebration && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center pointer-events-none">
             {/* Strobing background */}
-            <div className={`absolute inset-0 bg-gradient-to-br from-pink-500 via-purple-500 to-cyan-500 ${celebrationLevel === 2 ? 'animate-ping' : 'animate-pulse'} opacity-80`}></div>
+            <div className={`absolute inset-0 bg-gradient-to-br from-pink-500 via-purple-500 to-cyan-500 ${celebrationLevel >= 2 ? 'animate-ping' : 'animate-pulse'} opacity-80`}></div>
 
             {/* Spinning elements */}
             <div className="absolute inset-0">
-              {[...Array(celebrationLevel === 2 ? 50 : 20)].map((_, i) => (
+              {[...Array(celebrationLevel === 4 ? 200 : celebrationLevel === 3 ? 100 : celebrationLevel === 2 ? 50 : 20)].map((_, i) => (
                 <div
                   key={i}
                   className="absolute text-6xl animate-spin"
                   style={{
                     left: `${Math.random() * 100}%`,
                     top: `${Math.random() * 100}%`,
-                    animationDuration: celebrationLevel === 2 ? `${Math.random() * 1 + 0.5}s` : `${Math.random() * 2 + 1}s`,
+                    animationDuration: celebrationLevel >= 2 ? `${Math.random() * 1 + 0.5}s` : `${Math.random() * 2 + 1}s`,
                     opacity: 0.7,
-                    fontSize: celebrationLevel === 2 ? `${Math.random() * 4 + 4}rem` : '3.75rem'
+                    fontSize: celebrationLevel >= 2 ? `${Math.random() * 4 + 4}rem` : '3.75rem'
                   }}>
-                  {celebrationLevel === 2 ? ['🎸', '🎵', '⭐', '🔥', '💥'][Math.floor(Math.random() * 5)] : ['🌴', '🎵', '🌺', '🌊', '☀️'][Math.floor(Math.random() * 5)]}
+                  {celebrationLevel === 4 ? '🍞' : celebrationLevel === 3 ? ['🍞', '🎸', '⚡', '🌟', '💫'][Math.floor(Math.random() * 5)] : celebrationLevel === 2 ? ['🎸', '🎵', '⭐', '🔥', '💥'][Math.floor(Math.random() * 5)] : ['🌴', '🎵', '🌺', '🌊', '☀️'][Math.floor(Math.random() * 5)]}
                 </div>
               ))}
             </div>
 
             {/* Center message */}
             <div className="relative z-10 text-center">
-              <h2 className={`font-bold mb-8 ${celebrationLevel === 2 ? 'text-[12rem] animate-bounce' : 'text-9xl animate-pulse'}`}
+              <h2 className={`font-bold mb-8 ${celebrationLevel === 4 ? 'text-[16rem] animate-bounce' : celebrationLevel === 3 ? 'text-[14rem] animate-bounce' : celebrationLevel === 2 ? 'text-[12rem] animate-bounce' : 'text-9xl animate-pulse'}`}
                   style={{
-                    textShadow: celebrationLevel === 2
+                    textShadow: celebrationLevel === 4
+                      ? `
+                        0 0 50px #ffffff,
+                        0 0 100px #ffffff,
+                        0 0 150px #ffffff,
+                        0 0 200px #ff6600,
+                        0 0 250px #ff6600,
+                        0 0 300px #ff6600,
+                        20px 20px 0px #ff6600,
+                        -20px -20px 0px #ffffff
+                      `
+                      : celebrationLevel === 3
+                      ? `
+                        0 0 40px #ffff00,
+                        0 0 80px #ffff00,
+                        0 0 120px #ffff00,
+                        0 0 160px #ff0000,
+                        0 0 200px #ff0000,
+                        0 0 240px #ff0000,
+                        15px 15px 0px #ff0000,
+                        -15px -15px 0px #ffff00
+                      `
+                      : celebrationLevel === 2
                       ? `
                         0 0 30px #ff00ff,
                         0 0 60px #ff00ff,
@@ -313,28 +427,36 @@ function App() {
                         5px 5px 0px #00ffff,
                         -5px -5px 0px #ff00ff
                       `,
-                    background: celebrationLevel === 2
+                    background: celebrationLevel === 4
+                      ? 'linear-gradient(45deg, #ffffff, #ff6600, #ffffff, #ff6600, #ffffff)'
+                      : celebrationLevel === 3
+                      ? 'linear-gradient(45deg, #ffff00, #ff0000, #ff00ff, #00ffff, #ffff00)'
+                      : celebrationLevel === 2
                       ? 'linear-gradient(45deg, #ff0000, #ff00ff, #00ffff, #ffff00, #ff0000)'
                       : 'linear-gradient(45deg, #ff00ff, #00ffff, #ff00ff)',
                     WebkitBackgroundClip: 'text',
                     WebkitTextFillColor: 'transparent',
                     backgroundClip: 'text'
                   }}>
-                {celebrationLevel === 2 ? 'UNSTOPPABLE!!!' : 'LEGENDARY!!!'}
+                {celebrationLevel === 4 ? 'TOASTPOCALYPSE!!!' : celebrationLevel === 3 ? 'INFINITE!!!' : celebrationLevel === 2 ? 'UNSTOPPABLE!!!' : 'LEGENDARY!!!'}
               </h2>
-              <p className={`font-mono text-white font-bold ${celebrationLevel === 2 ? 'text-7xl' : 'text-5xl'}`}
+              <p className={`font-mono text-white font-bold ${celebrationLevel === 4 ? 'text-9xl' : celebrationLevel === 3 ? 'text-8xl' : celebrationLevel === 2 ? 'text-7xl' : 'text-5xl'}`}
                  style={{
-                   textShadow: celebrationLevel === 2
+                   textShadow: celebrationLevel === 4
+                     ? '0 0 60px #ffffff, 0 0 120px #ff6600, 0 0 180px #ffffff'
+                     : celebrationLevel === 3
+                     ? '0 0 50px #ffff00, 0 0 100px #ff0000, 0 0 150px #ff00ff'
+                     : celebrationLevel === 2
                      ? '0 0 40px #ff00ff, 0 0 80px #00ffff, 0 0 120px #ffff00'
                      : '0 0 30px #ff00ff, 0 0 60px #00ffff'
                  }}>
-                {celebrationLevel === 2 ? '🔥🎸 ULTIMATE UKULELE GOD! 🎸🔥' : '🎉 YOU\'RE A UKULELE MASTER! 🎉'}
+                {celebrationLevel === 4 ? '🍞🍞🍞 EVERYTHING IS TOAST! 🍞🍞🍞' : celebrationLevel === 3 ? '🍞⚡ TOAST MASTER SUPREME! ⚡🍞' : celebrationLevel === 2 ? '🔥🎸 ULTIMATE UKULELE GOD! 🎸🔥' : '🎉 YOU\'RE A UKULELE MASTER! 🎉'}
               </p>
             </div>
           </div>
         )}
 
-        {/* Spinning Guitar (appears at 50+ points) */}
+        {/* Spinning Guitar/Toaster (appears at 50+ points) */}
         {points >= 50 && (
           <div
             className="absolute pointer-events-none"
@@ -350,10 +472,35 @@ function App() {
               style={{
                 fontSize: '16rem',
                 animationDuration: '2s',
-                filter: 'drop-shadow(0 0 40px #ffff00) drop-shadow(0 0 80px #ff00ff)'
+                filter: points >= 500
+                  ? 'drop-shadow(0 0 40px #ff6600) drop-shadow(0 0 80px #ffffff)'
+                  : 'drop-shadow(0 0 40px #ffff00) drop-shadow(0 0 80px #ff00ff)'
               }}>
-              🎸
+              {points >= 500 ? '🍞' : '🎸'}
             </div>
+          </div>
+        )}
+
+        {/* Zooming Toaster (appears at 100+ points) */}
+        {points >= 100 && (
+          <div
+            id="zooming-toaster"
+            className="absolute pointer-events-none transition-all duration-1000 ease-in-out"
+            style={{
+              top: `${toasterPosition.y}%`,
+              left: `${toasterPosition.x}%`,
+              transform: 'translate(-50%, -50%)',
+              zIndex: 11
+            }}>
+            <img
+              src={toasterImage}
+              alt="zooming toaster"
+              style={{
+                width: '20rem',
+                height: '20rem',
+                filter: 'drop-shadow(0 0 60px #ff0000) drop-shadow(0 0 120px #ffff00)'
+              }}
+            />
           </div>
         )}
 
@@ -421,24 +568,24 @@ function App() {
           </div>
         </div>
 
-        {/* Palm tree silhouettes */}
-        <div className="absolute bottom-0 left-20 text-9xl opacity-40 text-cyan-400" style={{ textShadow: '0 0 20px #00ffff' }}>
-          🌴
+        {/* Palm tree silhouettes / Toasters at 500+ */}
+        <div className={`absolute bottom-0 left-20 text-9xl opacity-40 ${points >= 500 ? 'text-orange-400' : 'text-cyan-400'}`} style={{ textShadow: points >= 500 ? '0 0 20px #ff6600' : '0 0 20px #00ffff' }}>
+          {points >= 500 ? '🍞' : '🌴'}
         </div>
-        <div className="absolute bottom-0 right-32 text-9xl opacity-40 text-pink-400" style={{ textShadow: '0 0 20px #ff00ff' }}>
-          🌴
+        <div className={`absolute bottom-0 right-32 text-9xl opacity-40 ${points >= 500 ? 'text-white' : 'text-pink-400'}`} style={{ textShadow: points >= 500 ? '0 0 20px #ffffff' : '0 0 20px #ff00ff' }}>
+          {points >= 500 ? '🍞' : '🌴'}
         </div>
-        <div className="absolute top-40 left-40 text-7xl opacity-30 text-pink-400 animate-spin" style={{ textShadow: '0 0 20px #ff00ff', animationDuration: '25s' }}>
-          🌴
+        <div className={`absolute top-40 left-40 text-7xl opacity-30 ${points >= 500 ? 'text-orange-400' : 'text-pink-400'} animate-spin`} style={{ textShadow: points >= 500 ? '0 0 20px #ff6600' : '0 0 20px #ff00ff', animationDuration: '25s' }}>
+          {points >= 500 ? '🍞' : '🌴'}
         </div>
-        <div className="absolute top-60 right-60 text-6xl opacity-30 text-cyan-400 animate-spin" style={{ textShadow: '0 0 20px #00ffff', animationDuration: '20s', animationDirection: 'reverse' }}>
-          🌴
+        <div className={`absolute top-60 right-60 text-6xl opacity-30 ${points >= 500 ? 'text-white' : 'text-cyan-400'} animate-spin`} style={{ textShadow: points >= 500 ? '0 0 20px #ffffff' : '0 0 20px #00ffff', animationDuration: '20s', animationDirection: 'reverse' }}>
+          {points >= 500 ? '🍞' : '🌴'}
         </div>
-        <div className="absolute bottom-40 left-1/3 text-5xl opacity-25 text-pink-400 animate-spin" style={{ textShadow: '0 0 15px #ff00ff', animationDuration: '30s' }}>
-          🌴
+        <div className={`absolute bottom-40 left-1/3 text-5xl opacity-25 ${points >= 500 ? 'text-orange-400' : 'text-pink-400'} animate-spin`} style={{ textShadow: points >= 500 ? '0 0 15px #ff6600' : '0 0 15px #ff00ff', animationDuration: '30s' }}>
+          {points >= 500 ? '🍞' : '🌴'}
         </div>
-        <div className="absolute top-1/3 right-40 text-8xl opacity-35 text-cyan-400 animate-spin" style={{ textShadow: '0 0 25px #00ffff', animationDuration: '18s', animationDirection: 'reverse' }}>
-          🌴
+        <div className={`absolute top-1/3 right-40 text-8xl opacity-35 ${points >= 500 ? 'text-white' : 'text-cyan-400'} animate-spin`} style={{ textShadow: points >= 500 ? '0 0 25px #ffffff' : '0 0 25px #00ffff', animationDuration: '18s', animationDirection: 'reverse' }}>
+          {points >= 500 ? '🍞' : '🌴'}
         </div>
 
         {/* Main content */}
