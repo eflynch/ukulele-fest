@@ -21,7 +21,7 @@ function App() {
   const [activeTab, setActiveTab] = useState<Tab>('lineup')
   const [daysUntilFestival, setDaysUntilFestival] = useState(0)
   const [flyingElements, setFlyingElements] = useState<FlyingElement[]>([])
-  const [points, setPoints] = useState(499)
+  const [points, setPoints] = useState(0)
   const [gameStarted, setGameStarted] = useState(false)
   const [celebration, setCelebration] = useState(false)
   const [celebrationLevel, setCelebrationLevel] = useState(0) // 0 = none, 1 = 20pts, 2 = 50pts, 3 = 100pts, 4 = 500pts
