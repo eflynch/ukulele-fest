@@ -1,15 +1,20 @@
 import { useState, useEffect } from 'react'
 import festivalMap from './assets/festival map.png'
+import toasterImage from './assets/toaster.png'
 
 type Tab = 'lineup' | 'tickets' | 'camping' | 'sponsorship'
 
 interface FlyingElement {
   id: number
   emoji: string
+  isImage: boolean
+  pointValue: number
   top: number
+  left: number
   size: string
   color: string
   duration: number
+  angle: number
 }
 
 function App() {
@@ -20,15 +25,16 @@ function App() {
   const [gameStarted, setGameStarted] = useState(false)
   const [celebration, setCelebration] = useState(false)
 
-  const handleElementClick = (elementId: number) => {
+  const handleElementClick = (elementId: number, pointValue: number) => {
     if (!gameStarted) {
       setGameStarted(true)
     }
-    const newPoints = points + 1
+    const newPoints = points + pointValue
     setPoints(newPoints)
     setFlyingElements(prev => prev.filter(el => el.id !== elementId))
 
-    if (newPoints === 20) {
+    // Trigger celebration when first crossing 20 points
+    if (points < 20 && newPoints >= 20) {
       setCelebration(true)
       setTimeout(() => setCelebration(false), 5000) // Show for 5 seconds
     }
@@ -52,38 +58,67 @@ function App() {
   useEffect(() => {
     // Random flying elements
     const triggerRandomElements = () => {
-      const emojis = ['🌴', '🎵', '🌺', '🌊', '☀️']
+      const elements = [
+        { emoji: '🌴', isImage: false, pointValue: 1 },
+        { emoji: '🎵', isImage: false, pointValue: 2 },
+        { emoji: '🌺', isImage: false, pointValue: 3 },
+        { emoji: '🌊', isImage: false, pointValue: 2 },
+        { emoji: '☀️', isImage: false, pointValue: 3 },
+        { emoji: toasterImage, isImage: true, pointValue: 10 }
+      ]
       const colors = ['#00ffff', '#ff00ff', '#ff6b9d', '#ffa500']
 
-      // Create two elements at once
-      for (let i = 0; i < 2; i++) {
-        const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)]
-        const randomColor = colors[Math.floor(Math.random() * colors.length)]
-        const randomTop = Math.random() * 80 + 10 // 10-90% from top
-        const randomSize = Math.random() * 4 + 4 // 4-8rem
-        const randomDuration = Math.random() * 3 + 5 // 5-8 seconds
+      // Create one element
+      const randomElement = elements[Math.floor(Math.random() * elements.length)]
+      const randomColor = colors[Math.floor(Math.random() * colors.length)]
+      const randomAngle = Math.random() * 360 // Random angle in degrees
+      const randomSize = Math.random() * 6 + 2 // 2-8rem (much more variation)
+      const randomDuration = Math.random() * 4 + 5 // 5-9 seconds
 
-        const newElement: FlyingElement = {
-          id: Date.now() + i, // Add i to ensure unique IDs
-          emoji: randomEmoji,
-          top: randomTop,
-          size: `${randomSize}rem`,
-          color: randomColor,
-          duration: randomDuration
-        }
-
-        setFlyingElements(prev => [...prev, newElement])
-
-        // Remove element after animation completes
-        setTimeout(() => {
-          setFlyingElements(prev => prev.filter(el => el.id !== newElement.id))
-        }, randomDuration * 1000)
+      // Start from random edge of screen based on angle
+      let randomTop, randomLeft
+      if (randomAngle < 90) {
+        // Start from left side
+        randomLeft = -10
+        randomTop = Math.random() * 100
+      } else if (randomAngle < 180) {
+        // Start from top
+        randomTop = -10
+        randomLeft = Math.random() * 100
+      } else if (randomAngle < 270) {
+        // Start from right side
+        randomLeft = 110
+        randomTop = Math.random() * 100
+      } else {
+        // Start from bottom
+        randomTop = 110
+        randomLeft = Math.random() * 100
       }
+
+      const newElement: FlyingElement = {
+        id: Date.now(),
+        emoji: randomElement.emoji,
+        isImage: randomElement.isImage,
+        pointValue: randomElement.pointValue,
+        top: randomTop,
+        left: randomLeft,
+        size: `${randomSize}rem`,
+        color: randomColor,
+        duration: randomDuration,
+        angle: randomAngle
+      }
+
+      setFlyingElements(prev => [...prev, newElement])
+
+      // Remove element after animation completes
+      setTimeout(() => {
+        setFlyingElements(prev => prev.filter(el => el.id !== newElement.id))
+      }, randomDuration * 1000)
     }
 
-    // Trigger randomly between 10-20 seconds
+    // Trigger randomly between 1-3 seconds (much more frequent)
     const scheduleNext = () => {
-      const delay = Math.random() * 10000 + 10000 // 10-20 seconds
+      const delay = Math.random() * 2000 + 1000 // 1-3 seconds
       return setTimeout(() => {
         triggerRandomElements()
         scheduleNext()
@@ -95,7 +130,11 @@ function App() {
   }, [])
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-purple-900 via-pink-800 to-orange-600 select-none">
+    <div
+      className="min-h-screen bg-gradient-to-b from-purple-900 via-pink-800 to-orange-600 select-none"
+      style={{
+        cursor: points >= 20 ? `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewport='0 0 64 64' style='font-size:56px;'><text y='56'>🎸</text></svg>") 32 32, auto` : 'auto'
+      }}>
       <div className="relative overflow-hidden">
         {/* Retro grid background effect */}
         <div className="absolute inset-0 opacity-20">
@@ -111,33 +150,55 @@ function App() {
         </div>
 
         {/* Flying random elements */}
-        {flyingElements.map((element) => (
-          <div
-            key={element.id}
-            className="absolute opacity-60 cursor-pointer"
-            onClick={() => handleElementClick(element.id)}
-            style={{
-              top: `${element.top}%`,
-              left: '-10%',
-              fontSize: element.size,
-              color: element.color,
-              textShadow: `0 0 30px ${element.color}, 0 0 60px ${element.color}`,
-              animation: `slide-across ${element.duration}s linear`,
-              zIndex: 5
-            }}>
-            {element.emoji}
-          </div>
-        ))}
-        <style>{`
-          @keyframes slide-across {
-            from {
-              transform: translateX(0) rotate(0deg);
-            }
-            to {
-              transform: translateX(120vw) rotate(360deg);
-            }
-          }
-        `}</style>
+        {flyingElements.map((element) => {
+          // Calculate end position based on angle (travel 200vw in the direction of the angle)
+          const distance = 200 // viewport units
+          const angleRad = (element.angle * Math.PI) / 180
+          const endX = Math.cos(angleRad) * distance
+          const endY = Math.sin(angleRad) * distance
+
+          return (
+            <div
+              key={element.id}
+              className="absolute opacity-60"
+              onMouseDown={() => handleElementClick(element.id, element.pointValue)}
+              style={{
+                top: `${element.top}%`,
+                left: `${element.left}%`,
+                fontSize: element.isImage ? undefined : element.size,
+                color: element.isImage ? undefined : element.color,
+                textShadow: element.isImage ? undefined : `0 0 30px ${element.color}, 0 0 60px ${element.color}`,
+                animation: `fly-${element.id} ${element.duration}s linear`,
+                padding: points >= 20 ? '24px' : '12px',
+                zIndex: 5
+              }}>
+              {element.isImage ? (
+                <img
+                  src={element.emoji}
+                  alt="toaster"
+                  style={{
+                    width: element.size,
+                    height: element.size,
+                    filter: `drop-shadow(0 0 30px ${element.color}) drop-shadow(0 0 60px ${element.color})`
+                  }}
+                />
+              ) : (
+                element.emoji
+              )}
+              <style>{`
+                @keyframes fly-${element.id} {
+                  from {
+                    transform: translate(0, 0);
+                  }
+                  to {
+                    transform: translate(${endX}vw, ${endY}vh);
+                  }
+                }
+              `}</style>
+            </div>
+          )
+        })}
+
 
         {/* Points Counter */}
         {gameStarted && (
