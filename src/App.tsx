@@ -21,9 +21,10 @@ function App() {
   const [activeTab, setActiveTab] = useState<Tab>('lineup')
   const [daysUntilFestival, setDaysUntilFestival] = useState(0)
   const [flyingElements, setFlyingElements] = useState<FlyingElement[]>([])
-  const [points, setPoints] = useState(0)
+  const [points, setPoints] = useState(49)
   const [gameStarted, setGameStarted] = useState(false)
   const [celebration, setCelebration] = useState(false)
+  const [celebrationLevel, setCelebrationLevel] = useState(0) // 0 = none, 1 = 20pts, 2 = 50pts
 
   const handleElementClick = (elementId: number, pointValue: number) => {
     if (!gameStarted) {
@@ -35,6 +36,13 @@ function App() {
 
     // Trigger celebration when first crossing 20 points
     if (points < 20 && newPoints >= 20) {
+      setCelebrationLevel(1)
+      setCelebration(true)
+      setTimeout(() => setCelebration(false), 5000) // Show for 5 seconds
+    }
+    // Trigger MEGA celebration when first crossing 50 points
+    else if (points < 50 && newPoints >= 50) {
+      setCelebrationLevel(2)
       setCelebration(true)
       setTimeout(() => setCelebration(false), 5000) // Show for 5 seconds
     }
@@ -129,6 +137,46 @@ function App() {
     return () => clearTimeout(timeout)
   }, [])
 
+  // Collision detection for spinning guitar
+  useEffect(() => {
+    if (points < 50) return
+
+    const checkCollisions = () => {
+      const guitar = document.getElementById('spinning-guitar')
+      if (!guitar) return
+
+      const guitarRect = guitar.getBoundingClientRect()
+      const guitarCenterX = guitarRect.left + guitarRect.width / 2
+      const guitarCenterY = guitarRect.top + guitarRect.height / 2
+      const guitarRadius = guitarRect.width / 2
+
+      flyingElements.forEach((element) => {
+        const elementDiv = document.querySelector(`[data-element-id="${element.id}"]`)
+        if (!elementDiv) return
+
+        const elementRect = elementDiv.getBoundingClientRect()
+        const elementCenterX = elementRect.left + elementRect.width / 2
+        const elementCenterY = elementRect.top + elementRect.height / 2
+        const elementRadius = elementRect.width / 2
+
+        // Calculate distance between centers
+        const dx = guitarCenterX - elementCenterX
+        const dy = guitarCenterY - elementCenterY
+        const distance = Math.sqrt(dx * dx + dy * dy)
+
+        // Check if they're overlapping
+        if (distance < guitarRadius + elementRadius) {
+          handleElementClick(element.id, element.pointValue)
+        }
+      })
+
+      requestAnimationFrame(checkCollisions)
+    }
+
+    const animationId = requestAnimationFrame(checkCollisions)
+    return () => cancelAnimationFrame(animationId)
+  }, [points, flyingElements])
+
   return (
     <div
       className="min-h-screen bg-gradient-to-b from-purple-900 via-pink-800 to-orange-600 select-none"
@@ -160,6 +208,7 @@ function App() {
           return (
             <div
               key={element.id}
+              data-element-id={element.id}
               className="absolute opacity-60"
               onMouseDown={() => handleElementClick(element.id, element.pointValue)}
               style={{
@@ -219,52 +268,91 @@ function App() {
         {celebration && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center pointer-events-none">
             {/* Strobing background */}
-            <div className="absolute inset-0 bg-gradient-to-br from-pink-500 via-purple-500 to-cyan-500 animate-pulse opacity-80"></div>
+            <div className={`absolute inset-0 bg-gradient-to-br from-pink-500 via-purple-500 to-cyan-500 ${celebrationLevel === 2 ? 'animate-ping' : 'animate-pulse'} opacity-80`}></div>
 
             {/* Spinning elements */}
             <div className="absolute inset-0">
-              {[...Array(20)].map((_, i) => (
+              {[...Array(celebrationLevel === 2 ? 50 : 20)].map((_, i) => (
                 <div
                   key={i}
                   className="absolute text-6xl animate-spin"
                   style={{
                     left: `${Math.random() * 100}%`,
                     top: `${Math.random() * 100}%`,
-                    animationDuration: `${Math.random() * 2 + 1}s`,
-                    opacity: 0.7
+                    animationDuration: celebrationLevel === 2 ? `${Math.random() * 1 + 0.5}s` : `${Math.random() * 2 + 1}s`,
+                    opacity: 0.7,
+                    fontSize: celebrationLevel === 2 ? `${Math.random() * 4 + 4}rem` : '3.75rem'
                   }}>
-                  {['🌴', '🎵', '🌺', '🌊', '☀️'][Math.floor(Math.random() * 5)]}
+                  {celebrationLevel === 2 ? ['🎸', '🎵', '⭐', '🔥', '💥'][Math.floor(Math.random() * 5)] : ['🌴', '🎵', '🌺', '🌊', '☀️'][Math.floor(Math.random() * 5)]}
                 </div>
               ))}
             </div>
 
             {/* Center message */}
             <div className="relative z-10 text-center">
-              <h2 className="text-9xl font-bold mb-8 animate-pulse"
+              <h2 className={`font-bold mb-8 ${celebrationLevel === 2 ? 'text-[12rem] animate-bounce' : 'text-9xl animate-pulse'}`}
                   style={{
-                    textShadow: `
-                      0 0 20px #ff00ff,
-                      0 0 40px #ff00ff,
-                      0 0 60px #ff00ff,
-                      0 0 80px #00ffff,
-                      0 0 100px #00ffff,
-                      0 0 120px #00ffff,
-                      5px 5px 0px #00ffff,
-                      -5px -5px 0px #ff00ff
-                    `,
-                    background: 'linear-gradient(45deg, #ff00ff, #00ffff, #ff00ff)',
+                    textShadow: celebrationLevel === 2
+                      ? `
+                        0 0 30px #ff00ff,
+                        0 0 60px #ff00ff,
+                        0 0 90px #ff00ff,
+                        0 0 120px #00ffff,
+                        0 0 150px #00ffff,
+                        0 0 180px #00ffff,
+                        10px 10px 0px #00ffff,
+                        -10px -10px 0px #ff00ff
+                      `
+                      : `
+                        0 0 20px #ff00ff,
+                        0 0 40px #ff00ff,
+                        0 0 60px #ff00ff,
+                        0 0 80px #00ffff,
+                        0 0 100px #00ffff,
+                        0 0 120px #00ffff,
+                        5px 5px 0px #00ffff,
+                        -5px -5px 0px #ff00ff
+                      `,
+                    background: celebrationLevel === 2
+                      ? 'linear-gradient(45deg, #ff0000, #ff00ff, #00ffff, #ffff00, #ff0000)'
+                      : 'linear-gradient(45deg, #ff00ff, #00ffff, #ff00ff)',
                     WebkitBackgroundClip: 'text',
                     WebkitTextFillColor: 'transparent',
                     backgroundClip: 'text'
                   }}>
-                LEGENDARY!!!
+                {celebrationLevel === 2 ? 'UNSTOPPABLE!!!' : 'LEGENDARY!!!'}
               </h2>
-              <p className="text-5xl font-mono text-white font-bold"
+              <p className={`font-mono text-white font-bold ${celebrationLevel === 2 ? 'text-7xl' : 'text-5xl'}`}
                  style={{
-                   textShadow: '0 0 30px #ff00ff, 0 0 60px #00ffff'
+                   textShadow: celebrationLevel === 2
+                     ? '0 0 40px #ff00ff, 0 0 80px #00ffff, 0 0 120px #ffff00'
+                     : '0 0 30px #ff00ff, 0 0 60px #00ffff'
                  }}>
-                🎉 YOU'RE A UKULELE MASTER! 🎉
+                {celebrationLevel === 2 ? '🔥🎸 ULTIMATE UKULELE GOD! 🎸🔥' : '🎉 YOU\'RE A UKULELE MASTER! 🎉'}
               </p>
+            </div>
+          </div>
+        )}
+
+        {/* Spinning Guitar (appears at 50+ points) */}
+        {points >= 50 && (
+          <div
+            className="absolute pointer-events-none"
+            style={{
+              top: '30%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              zIndex: 10
+            }}>
+            <div
+              id="spinning-guitar"
+              className="animate-spin"
+              style={{
+                fontSize: '16rem',
+                animationDuration: '2s',
+                filter: 'drop-shadow(0 0 40px #ffff00) drop-shadow(0 0 80px #ff00ff)'
+              }}>
+              🎸
             </div>
           </div>
         )}
