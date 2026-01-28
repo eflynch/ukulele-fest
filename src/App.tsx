@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import festivalMap from './assets/festival map.png'
 import toasterImage from './assets/toaster.png'
+import CocktailChat from './CocktailChat'
 
 type Tab = 'lineup' | 'tickets' | 'camping' | 'sponsorship'
 
@@ -26,6 +27,7 @@ function App() {
   const [celebration, setCelebration] = useState(false)
   const [celebrationLevel, setCelebrationLevel] = useState(0) // 0 = none, 1 = 20pts, 2 = 50pts, 3 = 100pts, 4 = 500pts
   const [toasterPosition, setToasterPosition] = useState({ x: 25, y: 25 })
+  const [chatOpen, setChatOpen] = useState(false)
   const pointsRef = useRef(points)
 
   // Keep ref in sync with points
@@ -820,6 +822,22 @@ function App() {
         {/* Decorative elements - tropical geometric */}
         <div className="absolute top-20 left-20 w-40 h-40 border-4 border-pink-500 opacity-50 rotate-45"></div>
         <div className="absolute bottom-32 right-20 w-60 h-60 border-4 border-cyan-400 opacity-50 animate-spin" style={{ animationDuration: '15s' }}></div>
+      </div>
+
+      {/* Cocktail Chat Button and Popup */}
+      <div className="fixed bottom-6 right-6 z-50">
+        {chatOpen && (
+          <div className="absolute bottom-16 right-0 w-80 sm:w-96 shadow-2xl shadow-pink-500/30">
+            <CocktailChat />
+          </div>
+        )}
+        <button
+          onClick={() => setChatOpen(!chatOpen)}
+          className="w-14 h-14 rounded-full bg-gradient-to-r from-pink-500 to-cyan-500 text-3xl shadow-lg shadow-pink-500/50 hover:scale-110 transition-transform flex items-center justify-center"
+          title="An I Cocktail Recipe Generator"
+        >
+          {chatOpen ? '✕' : '🍹'}
+        </button>
       </div>
     </div>
   )
