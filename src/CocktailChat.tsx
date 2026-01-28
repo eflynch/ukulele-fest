@@ -179,7 +179,7 @@ export default function CocktailChat() {
   return (
     <div className="flex flex-col h-[500px] max-w-md mx-auto bg-black/50 rounded-lg border border-pink-500/50">
       <div className="p-3 border-b border-pink-500/50 flex justify-between items-center">
-        <h2 className="text-pink-400 font-bold text-lg">AI Cocktail Recipe Generator</h2>
+        <h2 className="text-pink-400 font-bold text-lg">An I Cocktail Recipe Generator</h2>
         <button
           onClick={handleReset}
           className="text-xs px-2 py-1 bg-pink-600 hover:bg-pink-500 rounded text-white transition-colors"
