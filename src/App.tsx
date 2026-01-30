@@ -3,8 +3,9 @@ import festivalMap from './assets/festival map.png'
 import toasterImage from './assets/toaster.png'
 import CocktailChat from './CocktailChat'
 import { lineupArtists } from './lineupData'
+import { faqItems } from './faqData'
 
-type Tab = 'lineup' | 'tickets' | 'camping' | 'sponsorship'
+type Tab = 'lineup' | 'tickets' | 'camping' | 'sponsorship' | 'faq'
 
 interface FlyingElement {
   id: number
@@ -632,7 +633,7 @@ function App() {
           {/* Tabs */}
           <div className="w-full max-w-4xl mb-8 pointer-events-auto">
             <div className="flex gap-4 justify-center flex-wrap">
-              {(['lineup', 'tickets', 'camping', 'sponsorship'] as const).map((tab) => (
+              {(['lineup', 'tickets', 'camping', 'sponsorship', 'faq'] as const).map((tab) => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
@@ -798,6 +799,25 @@ function App() {
                         Contact: sponsors@playthegrayaway.org
                       </p>
                     </div>
+                  </div>
+                </div>
+              )}
+
+              {activeTab === 'faq' && (
+                <div className="text-cyan-300">
+                  <h2 className="text-4xl font-bold mb-6 text-pink-300" style={{ textShadow: '0 0 10px #ff6b9d' }}>
+                    FAQ
+                  </h2>
+                  <div className="space-y-6 font-mono">
+                    {faqItems.map((item, index) => {
+                      const isCyan = index % 2 === 0
+                      return (
+                        <div key={index} className={`border-l-4 ${isCyan ? 'border-cyan-400' : 'border-pink-400'} pl-4 py-2`}>
+                          <h3 className={`text-xl font-bold ${isCyan ? 'text-cyan-300' : 'text-pink-300'}`}>{item.question}</h3>
+                          <p className={isCyan ? 'text-pink-300' : 'text-cyan-300'}>{item.answer}</p>
+                        </div>
+                      )
+                    })}
                   </div>
                 </div>
               )}
