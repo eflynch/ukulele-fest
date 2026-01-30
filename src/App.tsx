@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from 'react'
 import festivalMap from './assets/festival map.png'
 import toasterImage from './assets/toaster.png'
+import poster2024Image from './assets/playthegrayaway.png'
+import poster2025Image from './assets/ukulele-poster.png'
 import CocktailChat from './CocktailChat'
 import { lineupArtists } from './lineupData'
 import { faqItems } from './faqData'
@@ -818,6 +820,38 @@ function App() {
                         </div>
                       )
                     })}
+                  </div>
+
+                  {/* Festival History Section */}
+                  <h2 className="text-4xl font-bold mb-6 mt-12 text-pink-300" style={{ textShadow: '0 0 10px #ff6b9d' }}>
+                    FESTIVAL HISTORY
+                  </h2>
+                  <div className="space-y-8 font-mono">
+                    {/* 2025 - Second Annual */}
+                    <div className="border-2 border-pink-400/50 p-6 bg-pink-400/10">
+                      <h3 className="text-3xl font-bold text-pink-300 mb-4">2025 - Second Annual</h3>
+                      <img
+                        src={poster2025Image}
+                        alt="2025 Play the Gray Away Lineup"
+                        className="w-full rounded border-2 border-pink-400/50 mb-4"
+                        style={{
+                          boxShadow: '0 0 20px rgba(255, 0, 255, 0.3)'
+                        }}
+                      />
+                    </div>
+
+                    {/* 2024 - First Annual */}
+                    <div className="border-2 border-cyan-400/50 p-6 bg-cyan-400/10">
+                      <h3 className="text-3xl font-bold text-cyan-300 mb-4">2024 - First Annual</h3>
+                      <img
+                        src={poster2024Image}
+                        alt="2024 Play the Gray Away Lineup"
+                        className="w-full rounded border-2 border-cyan-400/50 mb-4"
+                        style={{
+                          boxShadow: '0 0 20px rgba(0, 255, 255, 0.3)'
+                        }}
+                      />
+                    </div>
                   </div>
                 </div>
               )}
