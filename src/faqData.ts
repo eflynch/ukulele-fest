@@ -44,4 +44,8 @@ export const faqItems: FaqItem[] = [
     question: 'Will there be an ATM on site?',
     answer: 'You must bring cash'
   },
+  {
+    question: 'Why is it called "AI" when "I" starts with a vowel? Should it not be "An I"?',
+    answer: 'You are asking the right questions.'
+  }
 ]

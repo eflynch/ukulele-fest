@@ -7,7 +7,7 @@ import CocktailChat from './CocktailChat'
 import { lineupArtists } from './lineupData'
 import { faqItems } from './faqData'
 
-type Tab = 'lineup' | 'tickets' | 'camping' | 'sponsorship' | 'faq'
+type Tab = 'lineup' | 'tickets' | 'camping' | 'sponsorship' | 'about'
 
 interface FlyingElement {
   id: number
@@ -635,7 +635,7 @@ function App() {
           {/* Tabs */}
           <div className="w-full max-w-4xl mb-8 pointer-events-auto">
             <div className="flex gap-4 justify-center flex-wrap">
-              {(['lineup', 'tickets', 'camping', 'sponsorship', 'faq'] as const).map((tab) => (
+              {(['lineup', 'tickets', 'camping', 'sponsorship', 'about'] as const).map((tab) => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
@@ -805,10 +805,10 @@ function App() {
                 </div>
               )}
 
-              {activeTab === 'faq' && (
+              {activeTab === 'about' && (
                 <div className="text-cyan-300">
                   <h2 className="text-4xl font-bold mb-6 text-pink-300" style={{ textShadow: '0 0 10px #ff6b9d' }}>
-                    FAQ
+                   FAQ 
                   </h2>
                   <div className="space-y-6 font-mono">
                     {faqItems.map((item, index) => {
