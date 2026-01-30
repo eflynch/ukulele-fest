@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import festivalMap from './assets/festival map.png'
 import toasterImage from './assets/toaster.png'
 import CocktailChat from './CocktailChat'
+import { lineupArtists } from './lineupData'
 
 type Tab = 'lineup' | 'tickets' | 'camping' | 'sponsorship'
 
@@ -659,25 +660,18 @@ function App() {
               {activeTab === 'lineup' && (
                 <div className="text-cyan-300">
                   <h2 className="text-4xl font-bold mb-6 text-pink-300" style={{ textShadow: '0 0 10px #ff6b9d' }}>
-                    LINEUP
+                    LINEUP (order TBD)
                   </h2>
                   <div className="space-y-6 font-mono">
-                    <div className="border-l-4 border-cyan-400 pl-4 py-2">
-                      <h3 className="text-2xl font-bold text-cyan-300">Plastic Ukulele Band</h3>
-                      <p className="text-pink-300">The host with the most</p>
-                    </div>
-                    <div className="border-l-4 border-pink-400 pl-4 py-2">
-                      <h3 className="text-2xl font-bold text-pink-300">DJ Fitzulele</h3>
-                      <p className="text-cyan-300">Innovative artist blending beats and ukes</p>
-                    </div>
-                    <div className="border-l-4 border-cyan-400 pl-4 py-2">
-                      <h3 className="text-2xl font-bold text-cyan-300">Jarxist Margon</h3>
-                      <p className="text-pink-300">Award-winning musicians and educators</p>
-                    </div>
-                    <div className="border-l-4 border-pink-400 pl-4 py-2">
-                      <h3 className="text-2xl font-bold text-pink-300">More artists TBA</h3>
-                      <p className="text-cyan-300">Stay tuned for more announcements!</p>
-                    </div>
+                    {lineupArtists.map((artist, index) => {
+                      const isCyan = index % 2 === 0
+                      return (
+                        <div key={index} className={`border-l-4 ${isCyan ? 'border-cyan-400' : 'border-pink-400'} pl-4 py-2`}>
+                          <h3 className={`text-2xl font-bold ${isCyan ? 'text-cyan-300' : 'text-pink-300'}`}>{artist.name}</h3>
+                          <p className={isCyan ? 'text-pink-300' : 'text-cyan-300'}>{artist.description}</p>
+                        </div>
+                      )
+                    })}
                   </div>
                 </div>
               )}
