@@ -22,11 +22,15 @@ export const lineupArtists: LineupArtist[] = [
   },
   {
     name: 'Rose Asteroid',
-    description: 'Ukuleles and stuff',
+    description: 'Ukuleles and stuff, who knows',
   },
   {
     name: 'Rangus',
-    description: '',
+    description: 'Now with ukuleles',
+  },
+    {
+    name: 'Evan and Josh',
+    description: 'Creatively named ukulele duo',
   },
     {
     name: 'More artists TBA',

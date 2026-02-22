@@ -628,7 +628,7 @@ function App() {
                  style={{
                    textShadow: '0 0 20px #00ffff, 0 0 40px #00ffff, 0 0 60px #00ffff'
                  }}>
-              ▲▲▲ {daysUntilFestival} DAYS UNTIL UKULELE FEST!!! ▲▲▲
+              <p className="text-8xl">{daysUntilFestival}</p> DAYS UNTIL UKULELE FEST!!!
             </div>
           </div>
 
