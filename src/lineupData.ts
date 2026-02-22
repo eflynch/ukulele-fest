@@ -13,12 +13,8 @@ export const lineupArtists: LineupArtist[] = [
     description: 'Spinning the finest ukulele beats',
   },
   {
-    name: 'Jarxist Margon',
-    description: 'Award-winning musicians and educators',
-  },
-  {
     name: 'MAD',
-    description: 'You know it',
+    description: 'Theatrical ukulele-rock',
   },
   {
     name: 'Paper Castles',
@@ -26,6 +22,10 @@ export const lineupArtists: LineupArtist[] = [
   },
   {
     name: 'Rose Asteroid',
+    description: 'Ukuleles and stuff',
+  },
+  {
+    name: 'Rangus',
     description: '',
   },
     {
