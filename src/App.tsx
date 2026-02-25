@@ -512,7 +512,7 @@ function App() {
         )}
 
         {/* Neon Ukulele */}
-        <div className="absolute top-32 left-1/2 -translate-x-1/2">
+        <div className="absolute top-32 left-1/2 -translate-x-1/2 opacity-50">
           {/* Ukulele body outline */}
           <div className="relative w-80 h-96">
             {/* Body shape */}
@@ -603,8 +603,8 @@ function App() {
                  style={{
                    textShadow: '0 0 10px #ff6b9d, 0 0 20px #ff6b9d'
                  }}>
-              ✧ THIRD ANNUAL • 2/28/2026 ✧
-            </div>
+              ✧ 2/28/2026 • doors at 7 ✧
+            </div> 
             <h1 className="text-8xl font-bold mb-4 animate-pulse"
                 style={{
                   textShadow: `
@@ -629,7 +629,7 @@ function App() {
                  style={{
                    textShadow: '0 0 20px #00ffff, 0 0 40px #00ffff, 0 0 60px #00ffff'
                  }}>
-              <p className="text-8xl">{daysUntilFestival}</p> DAYS UNTIL UKULELE FEST!!!
+              DAYS UNTIL THIRD ANNUAL UKULELE FEST: {daysUntilFestival}
             </div>
           </div>
 
