@@ -272,16 +272,21 @@ function App() {
     return () => cancelAnimationFrame(animationId)
   }, [points, flyingElements])
 
+  const customCursor = points >= 500
+    ? `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewport='0 0 64 64' style='font-size:56px;'><text y='56'>🍞</text></svg>") 32 32, auto`
+    : points >= 20
+    ? `url("/ukulele.png") 32 32, auto`
+    : null
+
   return (
     <div
       className="min-h-screen bg-gradient-to-b from-purple-900 via-pink-800 to-orange-600 select-none"
-      style={{
-        cursor: points >= 500
-          ? `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewport='0 0 64 64' style='font-size:56px;'><text y='56'>🍞</text></svg>") 32 32, auto`
-          : points >= 20
-          ? `url("/ukulele.png") 32 32, auto`
-          : 'auto'
-      }}>
+      style={{ cursor: customCursor ?? 'auto' }}>
+      {customCursor && (
+        <style>{`* { cursor: url("${points >= 500
+          ? `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewport='0 0 64 64' style='font-size:56px;'><text y='56'>🍞</text></svg>`
+          : `/ukulele.png`}") 32 32, auto !important; }`}</style>
+      )}
       <div className="relative overflow-hidden">
         {/* Retro grid background effect */}
         <div className="absolute inset-0 opacity-20">
