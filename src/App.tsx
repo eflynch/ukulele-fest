@@ -636,12 +636,30 @@ function App() {
                 }}>
               PLAY THE GRAY AWAY
             </h1>
-            <div className="text-5xl text-cyan-300 font-mono tracking-widest mb-6 animate-pulse"
+            {(()=>{
+              if (daysUntilFestival < 0) {
+                return <div className="text-5xl text-pink-400 font-mono tracking-widest mb-6 animate-pulse"
+                   style={{
+                     textShadow: '0 0 20px #ff6b9d, 0 0 40px #ff6b9d, 0 0 60px #ff6b9d'
+                   }}>
+                  THE THIRD ANNUAL UKULELE FEST WAS {Math.abs(daysUntilFestival)} DAYS AGO!
+                </div>
+              }
+              if (daysUntilFestival === 0) {
+                return <div className="text-5xl text-green-400 font-mono tracking-widest mb-6 animate-pulse"
+                   style={{
+                     textShadow: '0 0 20px #00ff00, 0 0 40px #00ff00, 0 0 60px #00ff00'
+                   }}>
+                  THIRD ANNUAL AND TODAY!!!
+                </div>
+              }
+              return <div className="text-5xl text-cyan-300 font-mono tracking-widest mb-6 animate-pulse"
                  style={{
                    textShadow: '0 0 20px #00ffff, 0 0 40px #00ffff, 0 0 60px #00ffff'
                  }}>
               DAYS UNTIL THIRD ANNUAL UKULELE FEST: {daysUntilFestival}
             </div>
+            })()}
           </div>
 
           {/* Tabs */}
