@@ -279,7 +279,7 @@ function App() {
         cursor: points >= 500
           ? `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewport='0 0 64 64' style='font-size:56px;'><text y='56'>🍞</text></svg>") 32 32, auto`
           : points >= 20
-          ? `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewport='0 0 64 64' style='font-size:56px;'><text y='56'>🎸</text></svg>") 32 32, auto`
+          ? `url("/ukulele.png") 32 32, auto`
           : 'auto'
       }}>
       <div className="relative overflow-hidden">
@@ -371,20 +371,26 @@ function App() {
 
             {/* Spinning elements */}
             <div className="absolute inset-0">
-              {[...Array(celebrationLevel === 4 ? 200 : celebrationLevel === 3 ? 100 : celebrationLevel === 2 ? 50 : 20)].map((_, i) => (
-                <div
-                  key={i}
-                  className="absolute text-6xl animate-spin"
-                  style={{
-                    left: `${Math.random() * 100}%`,
-                    top: `${Math.random() * 100}%`,
-                    animationDuration: celebrationLevel >= 2 ? `${Math.random() * 1 + 0.5}s` : `${Math.random() * 2 + 1}s`,
-                    opacity: 0.7,
-                    fontSize: celebrationLevel >= 2 ? `${Math.random() * 4 + 4}rem` : '3.75rem'
-                  }}>
-                  {celebrationLevel === 4 ? '🍞' : celebrationLevel === 3 ? ['🍞', '🎸', '⚡', '🌟', '💫'][Math.floor(Math.random() * 5)] : celebrationLevel === 2 ? ['🎸', '🎵', '⭐', '🔥', '💥'][Math.floor(Math.random() * 5)] : ['🌴', '🎵', '🌺', '🌊', '☀️'][Math.floor(Math.random() * 5)]}
-                </div>
-              ))}
+              {[...Array(celebrationLevel === 4 ? 200 : celebrationLevel === 3 ? 100 : celebrationLevel === 2 ? 50 : 20)].map((_, i) => {
+                const size = celebrationLevel >= 2 ? `${Math.random() * 4 + 4}rem` : '3.75rem'
+                const item = celebrationLevel === 4 ? '🍞' : celebrationLevel === 3 ? ['🍞', 'ukulele', '⚡', '🌟', '💫'][Math.floor(Math.random() * 5)] : celebrationLevel === 2 ? ['ukulele', '🎵', '⭐', '🔥', '💥'][Math.floor(Math.random() * 5)] : ['🌴', '🎵', '🌺', '🌊', '☀️'][Math.floor(Math.random() * 5)]
+                return (
+                  <div
+                    key={i}
+                    className="absolute animate-spin"
+                    style={{
+                      left: `${Math.random() * 100}%`,
+                      top: `${Math.random() * 100}%`,
+                      animationDuration: celebrationLevel >= 2 ? `${Math.random() * 1 + 0.5}s` : `${Math.random() * 2 + 1}s`,
+                      opacity: 0.7,
+                      fontSize: item === 'ukulele' ? undefined : size,
+                      width: item === 'ukulele' ? size : undefined,
+                      height: item === 'ukulele' ? size : undefined,
+                    }}>
+                    {item === 'ukulele' ? <img src="/ukulele.png" alt="ukulele" style={{ width: '100%', height: '100%', objectFit: 'contain' }} /> : item}
+                  </div>
+                )
+              })}
             </div>
 
             {/* Center message */}
@@ -457,7 +463,7 @@ function App() {
                      ? '0 0 40px #ff00ff, 0 0 80px #00ffff, 0 0 120px #ffff00'
                      : '0 0 30px #ff00ff, 0 0 60px #00ffff'
                  }}>
-                {celebrationLevel === 4 ? '🍞🍞🍞 EVERYTHING IS TOAST! 🍞🍞🍞' : celebrationLevel === 3 ? '🍞⚡ TOAST MASTER SUPREME! ⚡🍞' : celebrationLevel === 2 ? '🔥🎸 ULTIMATE UKULELE GOD! 🎸🔥' : '🎉 YOU\'RE A UKULELE MASTER! 🎉'}
+                {celebrationLevel === 4 ? '🍞🍞🍞 EVERYTHING IS TOAST! 🍞🍞🍞' : celebrationLevel === 3 ? '🍞⚡ TOAST MASTER SUPREME! ⚡🍞' : celebrationLevel === 2 ? '🔥🎵 ULTIMATE UKULELE GOD! 🎵🔥' : '🎉 YOU\'RE A UKULELE MASTER! 🎉'}
               </p>
             </div>
           </div>
@@ -483,7 +489,7 @@ function App() {
                   ? 'drop-shadow(0 0 40px #ff6600) drop-shadow(0 0 80px #ffffff)'
                   : 'drop-shadow(0 0 40px #ffff00) drop-shadow(0 0 80px #ff00ff)'
               }}>
-              {points >= 500 ? '🍞' : '🎸'}
+              {points >= 500 ? '🍞' : <img src="/ukulele.png" alt="ukulele" style={{ width: '16rem', height: '16rem', objectFit: 'contain' }} />}
             </div>
           </div>
         )}
