@@ -3,6 +3,7 @@ import festivalMap from './assets/festival map.png'
 import toasterImage from './assets/toaster.png'
 import poster2024Image from './assets/playthegrayaway.png'
 import poster2025Image from './assets/ukulele-poster.png'
+import poster2026Image from './assets/poster.png'
 import CocktailChat from './CocktailChat'
 import { lineupArtists } from './lineupData'
 import { faqItems } from './faqData'
@@ -807,6 +808,14 @@ function App() {
 
               {activeTab === 'about' && (
                 <div className="text-cyan-300">
+                  <img
+                        src={poster2026Image}
+                        alt="2026 Play the Gray Away Poster"
+                        className="w-full rounded border-2 border-pink-400/50 mb-4"
+                        style={{
+                          boxShadow: '0 0 20px rgba(255, 0, 255, 0.3)'
+                        }}
+                      />
                   <h2 className="text-4xl font-bold mb-6 text-pink-300" style={{ textShadow: '0 0 10px #ff6b9d' }}>
                    FAQ 
                   </h2>

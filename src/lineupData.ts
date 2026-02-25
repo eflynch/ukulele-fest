@@ -32,6 +32,10 @@ export const lineupArtists: LineupArtist[] = [
     name: 'Evan and Josh',
     description: 'Creatively named ukulele duo',
   },
+  {
+    name: "The Finding Forrester is a fantastic movie and everyone should watch it again soon Band",
+    description: '... with ukuleles',
+  },
     {
     name: 'More artists TBA',
     description: 'Stay tuned for more announcements!',
