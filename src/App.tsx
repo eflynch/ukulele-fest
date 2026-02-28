@@ -650,7 +650,7 @@ function App() {
                    style={{
                      textShadow: '0 0 20px #00ff00, 0 0 40px #00ff00, 0 0 60px #00ff00'
                    }}>
-                  THIRD ANNUAL AND TODAY!!!
+                  TODAY!!!
                 </div>
               }
               return <div className="text-5xl text-cyan-300 font-mono tracking-widest mb-6 animate-pulse"
@@ -693,14 +693,17 @@ function App() {
               {activeTab === 'lineup' && (
                 <div className="text-cyan-300">
                   <h2 className="text-4xl font-bold mb-6 text-pink-300" style={{ textShadow: '0 0 10px #ff6b9d' }}>
-                    LINEUP (order TBD)
+                    LINEUP & SCHEDULE
                   </h2>
                   <div className="space-y-6 font-mono">
+                    <div style={{display:"flex", justifyContent:"space-between", fontSize:24}}><span className="text-pink-300">Living Room Stage</span><span>Kitchen Stage</span></div>
                     {lineupArtists.map((artist, index) => {
-                      const isCyan = index % 2 === 0
+                      const isCyan = artist.stage === "kitchen"
                       return (
-                        <div key={index} className={`border-l-4 ${isCyan ? 'border-cyan-400' : 'border-pink-400'} pl-4 py-2`}>
-                          <h3 className={`text-2xl font-bold ${isCyan ? 'text-cyan-300' : 'text-pink-300'}`}>{artist.name}</h3>
+                        <div key={index} className={`${artist.stage === "kitchen" ? "border-r-3" : "border-l-4"} ${isCyan ? 'border-cyan-400' : 'border-pink-400'} pl-4 pr-4 py-2`} style={{
+                          textAlign: artist.stage === "kitchen" ? "right" : "left"
+                        }}>
+                          <h3 className={`text-2xl font-bold ${isCyan ? 'text-cyan-300' : 'text-pink-300'}`}>{artist.time}pm: {artist.name}</h3>
                           <p className={isCyan ? 'text-pink-300' : 'text-cyan-300'}>{artist.description}</p>
                         </div>
                       )
